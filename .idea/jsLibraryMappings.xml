@@ -3,6 +3,7 @@
   <component name="JavaScriptLibraryMappings">
     <file url="file://$PROJECT_DIR$/Jakefile.js" libraries="{Node.js Globals}" />
     <file url="file://$PROJECT_DIR$/src/server/_server_test.js" libraries="{Node.js Globals}" />
+    <file url="file://$PROJECT_DIR$/src/server/server.js" libraries="{Node.js Globals}" />
   </component>
 </project>
 

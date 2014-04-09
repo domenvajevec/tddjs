@@ -13,7 +13,7 @@
         files.exclude("node_modules");
         var options = nodeLintOptions();
         var passed = lint.validateFileList(files.toArray(), options, {});
-        if (!passed) fail("Lint failed");
+        if (!passed) fail("Lint failed"); //lint fails if error
     });
 
     desc("Integrate");

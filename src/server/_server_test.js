@@ -1,22 +1,15 @@
+
 "use strict";
-var server = require('./server.js');
-var http = require('http');
 
+var server = require("./server.js");
+var http = require("http");
 
-exports.tearDown = function(done){
-    server.stop(function(){
-//        console.log("teardown");
-        done();
-    });
-
-};
-
-
-exports.testHelloWorld = function(test){
+exports.test_serverReturnsHelloWorld = function(test) {
     server.start(8080);
-    var request = http.get("http://localhost:8080", function(response){
+    var request = http.get("http://localhost:8080");
+    request.on("response", function(response) {
         var receivedData = false;
-        response.setEncoding('utf-8');
+        response.setEncoding("utf8");
 
         test.equals(200, response.statusCode, "status code");
         response.on("data", function(chunk) {
@@ -25,10 +18,30 @@ exports.testHelloWorld = function(test){
         });
         response.on("end", function() {
             test.ok(receivedData, "should have received response data");
-            test.done();
+            server.stop(function() {
+                test.done();
+            });
         });
-//        response.on("data", function(){
-//            test.done();
-//        });
     });
+};
+
+exports.test_serverRequiresPortNumber = function(test) {
+    test.throws(function() {
+        server.start();
+    });
+    test.done();
+};
+
+exports.test_serverRunsCallbackWhenStopCompletes = function(test) {
+    server.start(8080);
+    server.stop(function() {
+        test.done();
+    });
+};
+
+exports.test_stopCalledWhenServerIsntRunningThrowsException = function(test) {
+    test.throws(function() {
+        server.stop();
+    });
+    test.done();
 };

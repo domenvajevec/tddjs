@@ -2,10 +2,10 @@
 (function() {
     "use strict";
     desc("Build and test");
-    task("default", ["lint"]);
+    task("default", ["lint","test"]);
 
     desc("Lint everything");
-    task("lint", [], function() {
+    task("lint",[], function() {
         var lint = require("./build/lint/lint_runner.js");
 
         var files = new jake.FileList();
@@ -16,8 +16,18 @@
         if (!passed) fail("Lint failed"); //lint fails if error
     });
 
+    desc("Test everything");
+    task("test", [], function(){
+       console.log("test goes here");
+        var reporter = require("nodeunit").reporters['default'];
+        reporter.run(['src/server/_server_test.js'], null, function(failures){
+            if(failures) fail("Tests failed!");
+            complete();
+        });
+    }, {async: true});
+
     desc("Integrate");
-    task("Integrate", ["default"], function(){
+    task("integrate", ["default"], function(){
         console.log("1. Make sure 'git status' is clean.");
         console.log("2. Build on the integration box.");
         console.log("   a. Walk over to integration box.");

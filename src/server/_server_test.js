@@ -3,6 +3,7 @@
 
 var server = require("./server.js");
 var http = require("http");
+var fs = require('fs');
 
 exports.test_serverReturnsHelloWorld = function(test) {
     server.start(8080);
@@ -23,6 +24,20 @@ exports.test_serverReturnsHelloWorld = function(test) {
             });
         });
     });
+};
+
+exports.test_serverServesAFile = function(test) {
+    var testDir = "generated/test";
+    var testFile = testDir + "/test.html";
+
+    try {
+        fs.writeFileSync(testFile, "Hello world");
+        test.done();
+    }
+    finally {
+        fs.unlinkSync(testFile);
+        test.ok(!fs.existsSync(testFile), "file should have been deleted");
+    }
 };
 
 exports.test_serverRequiresPortNumber = function(test) {

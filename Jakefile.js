@@ -1,8 +1,18 @@
-/*global desc, task, jake, fail, complete */
+/*global desc, task, jake, fail, complete, directory*/
 (function() {
     "use strict";
 
     var NODE_VERSION = "v0.8.6";
+    var GENERATED_DIR = "generated";
+    var TEMP_TESTFILE_DIR = GENERATED_DIR + "/test";
+
+    directory(TEMP_TESTFILE_DIR);
+
+    desc("Delete all generated files");
+    task("clean", [], function() {
+        jake.rmRf(GENERATED_DIR);
+    });
+
     desc("Build and test");
     task("default", ["lint","test"]);
 

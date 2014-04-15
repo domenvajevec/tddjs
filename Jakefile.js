@@ -1,45 +1,53 @@
-/*global desc, task, jake, fail, complete */
+/*global desc, task, jake, fail, complete, directory*/
 (function() {
     "use strict";
 
     var NODE_VERSION = "v0.8.6";
-    desc("Build and test");
-    task("default", ["lint","test"]);
+    var GENERATED_DIR = "generated";
+    var TEMP_TESTFILE_DIR = GENERATED_DIR + "/test";
 
-    desc("Ensure correct version of node is present");
-    task("node", [], function(){
-        console.log("node stuff here");
+    directory(TEMP_TESTFILE_DIR);
+
+    desc("Delete all generated files");
+    task("clean", [], function() {
+        jake.rmRf(GENERATED_DIR);
     });
 
+    desc("Build and test");
+    task("default", ["lint", "test"]);
+
     desc("Lint everything");
-    task("lint",["node"], function() {
+    task("lint", ["nodeVersion"], function() {
         var lint = require("./build/lint/lint_runner.js");
 
-        var files = new jake.FileList();
-        files.include("**/*.js");
-        files.exclude("node_modules");
+        var javascriptFiles = new jake.FileList();
+        javascriptFiles.include("**/*.js");
+        javascriptFiles.exclude("node_modules");
         var options = nodeLintOptions();
-        var passed = lint.validateFileList(files.toArray(), options, {});
-        if (!passed) fail("Lint failed"); //lint fails if error
+        var passed = lint.validateFileList(javascriptFiles.toArray(), options, {});
+        if (!passed) fail("Lint failed");
     });
 
     desc("Test everything");
-    task("test", [], function(){
-       console.log("test goes here");
-        var reporter = require("nodeunit").reporters['default'];
-        reporter.run(['src/server/_server_test.js'], null, function(failures){
-            if(failures) fail("Tests failed!");
+    task("test", ["nodeVersion", TEMP_TESTFILE_DIR], function() {
+        var testFiles = new jake.FileList();
+        testFiles.include("**/_*_test.js");
+        testFiles.exclude("node_modules");
+
+        var reporter = require("nodeunit").reporters["default"];
+        reporter.run(testFiles.toArray(), null, function(failures) {
+            if (failures) fail("Tests failed");
             complete();
         });
     }, {async: true});
 
     desc("Integrate");
-    task("integrate", ["default"], function(){
+    task("integrate", ["default"], function() {
         console.log("1. Make sure 'git status' is clean.");
         console.log("2. Build on the integration box.");
         console.log("   a. Walk over to integration box.");
         console.log("   b. 'git pull'");
-        console.log("   c. 'jake'");
+        console.log("   c. 'jake strict=true'");
         console.log("   d. If jake fails, stop! Try again after fixing the issue.");
         console.log("3. 'git checkout integration'");
         console.log("4. 'git merge master --no-ff --log'");
@@ -96,7 +104,6 @@
         });
         process.run();
     }
-
 
     function nodeLintOptions() {
         return {

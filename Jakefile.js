@@ -41,24 +41,18 @@
         });
     }, {async: true});
 
-    desc("Integrate");
-    task("integrate", ["default"], function() {
+    desc("Deploy to Heroku");
+    task("deploy", ["default"], function() {
         console.log("1. Make sure 'git status' is clean.");
-        console.log("2. Build on the integration box.");
-        console.log("   a. Walk over to integration box.");
-        console.log("   b. 'git pull'");
-        console.log("   c. 'jake strict=true'");
-        console.log("   d. If jake fails, stop! Try again after fixing the issue.");
-        console.log("3. 'git checkout integration'");
-        console.log("4. 'git merge master --no-ff --log'");
-        console.log("5. 'git checkout master'");
+        console.log("2. 'git push heroku master'");
+        console.log("3. 'jake test'");
     });
 
-//	desc("Ensure correct version of Node is present. Use 'strict=true' to require exact match");
+//  desc("Ensure correct version of Node is present. Use 'strict=true' to require exact match");
     task("nodeVersion", [], function() {
         function failWithQualifier(qualifier) {
             fail("Incorrect node version. Expected " + qualifier +
-                " [" + expectedString + "], but was [" + actualString + "].");
+                    " [" + expectedString + "], but was [" + actualString + "].");
         }
 
         var expectedString = NODE_VERSION;
@@ -77,6 +71,27 @@
             if (actual[0] === expected[0] && actual[1] === expected[1] && actual[2] < expected[2]) failWithQualifier("at least");
         }
 
+    });
+
+    desc("Integration checklist");
+    task("integrate", ["default"], function() {
+        console.log("1. Make sure 'git status' is clean.");
+        console.log("2. Build on the integration box.");
+        console.log("   a. Walk over to integration box.");
+        console.log("   b. 'git pull'");
+        console.log("   c. 'jake strict=true'");
+        console.log("   d. If jake fails, stop! Try again after fixing the issue.");
+        console.log("3. 'git checkout integration'");
+        console.log("4. 'git merge master --no-ff --log'");
+        console.log("5. 'git checkout master'");
+    });
+
+    desc("End-of-episode checklist");
+    task("episode", [], function() {
+        console.log("1. Save recording.");
+        console.log("2. Double-check sound and framing.");
+        console.log("3. Commit source code.");
+        console.log("4. Tag episode: 'git tag -a episodeXX -m \"End of episode XX\"'");
     });
 
     function parseNodeVersion(description, versionString) {
